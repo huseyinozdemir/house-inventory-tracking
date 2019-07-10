@@ -11,4 +11,5 @@ urlpatterns = [
     path('fixtures', views.fixtures, name='fixtures'),
     path('logout', views.logout, name='logout'),
     path('building/<slug:Tag>', views.building, name='building'),
+    path('flat/<slug:Tag>', views.flat, name='flat'),
 ]

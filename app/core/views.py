@@ -186,7 +186,7 @@ def __buildingId(request, Tag):
         'row': row,
         'info': info,
     }
-    return render(request, 'item.html', context)
+    return render(request, 'item_building.html', context)
 
 
 def __buildingNew(request, Tag):
@@ -208,7 +208,7 @@ def __buildingNew(request, Tag):
         'title': 'Item',
         'info': '',
     }
-    return render(request, 'item.html', context)
+    return render(request, 'item_building.html', context)
 
 @csrf_protect
 def building(request, Tag):
@@ -216,6 +216,69 @@ def building(request, Tag):
         return __buildingNew(request, Tag)
 
     return __buildingId(request, Tag)
+
+def __flatId(request, Tag):
+    token = request.session['token'] if 'token' in request.session.keys() else ''
+    if token == '': return redirect(index)
+
+    url = API_HOST+API_FLAT_URL+str(Tag)+'/'
+    url_building = API_HOST+API_BUILDING_URL
+
+    info = ''
+    if request.POST:
+        val = {
+            'name' : request.POST.get('name', ''),
+            'building_id' : request.POST.get('building_id', ''),
+        }
+        res = __save(token, url, val, "PUT")
+        if res == 'logout':
+            return redirect(logout)
+        info = res
+
+    row = __source(token, url)
+    buildings = __source(token, url_building)
+    context = {
+        'title': 'Item',
+        'row': row,
+        'buildings': buildings,
+        'info': info,
+    }
+    return render(request, 'item_flat.html', context)
+
+
+def __flatNew(request, Tag):
+    token = request.session['token'] if 'token' in request.session.keys() else ''
+    if token == '': return redirect(index)
+    url = API_HOST+API_FLAT_URL
+    url_building = API_HOST+API_BUILDING_URL
+
+    info = ''
+    if request.POST:
+        val = {
+            'name' : request.POST.get('name', ''),
+            'building_id' : request.POST.get('building_id', ''),
+        }
+        res = __save(token, url, val, "POST")
+        if res == 'logout':
+            return redirect(logout)
+        return redirect(flats)
+
+
+    buildings = __source(token, url_building)
+    context = {
+        'title': 'Item',
+        'info': '',
+        'buildings': buildings,
+    }
+    return render(request, 'item_flat.html', context)
+
+
+@csrf_protect
+def flat(request, Tag):
+    if Tag == 'new':
+        return __flatNew(request, Tag)
+
+    return __flatId(request, Tag)
 
 def logout(request):
     request.session['token'] = ''
