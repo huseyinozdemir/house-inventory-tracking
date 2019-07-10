@@ -10,5 +10,5 @@ urlpatterns = [
     path('rooms', views.rooms, name='rooms'),
     path('fixtures', views.fixtures, name='fixtures'),
     path('logout', views.logout, name='logout'),
-    path('detay/<int:Id>', views.detay, name='detay'),
+    path('building/<slug:Tag>', views.building, name='building'),
 ]

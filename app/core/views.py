@@ -73,7 +73,6 @@ def index(request):
             if res['token'] is not None:
                 token = res['token']
                 request.session['token'] = token
-                request.session['login'] = 1
                 return redirect(dashboard)
     context = {}
     return render(request, 'login.html', context)
@@ -148,11 +147,76 @@ def fixtures(request):
     }
     return render(request, 'lists.html', context)
 
+def __save(token, url, val=None, method="POST"):
+    headers = {
+        'Authorization': 'Token ' + token,
+    }
+
+    response = requests.request(
+        method, url=url, data=val, headers=headers
+    )
+
+    if not response:
+        return 'logout'
+
+    res = 'Success'
+
+    return res
+
+
+def __buildingId(request, Tag):
+    token = request.session['token'] if 'token' in request.session.keys() else ''
+    if token == '': return redirect(index)
+
+    url = API_HOST+API_BUILDING_URL+str(Tag)+'/'
+
+    info = ''
+    if request.POST:
+        val = {
+            'name' : request.POST.get('name', ''),
+        }
+        res = __save(token, url, val, "PUT")
+        if res == 'logout':
+            return redirect(logout)
+        info = res
+
+    row = __source(token, url)
+    context = {
+        'title': 'Item',
+        'row': row,
+        'info': info,
+    }
+    return render(request, 'item.html', context)
+
+
+def __buildingNew(request, Tag):
+    token = request.session['token'] if 'token' in request.session.keys() else ''
+    if token == '': return redirect(index)
+    url = API_HOST+API_BUILDING_URL
+
+    info = ''
+    if request.POST:
+        val = {
+            'name' : request.POST.get('name', ''),
+        }
+        res = __save(token, url, val, "POST")
+        if res == 'logout':
+            return redirect(logout)
+        return redirect(buildings)
+
+    context = {
+        'title': 'Item',
+        'info': '',
+    }
+    return render(request, 'item.html', context)
+
+@csrf_protect
+def building(request, Tag):
+    if Tag == 'new':
+        return __buildingNew(request, Tag)
+
+    return __buildingId(request, Tag)
 
 def logout(request):
     request.session['token'] = ''
-    request.session['login'] = 0
     return redirect(index)
-
-def detay(request, Id):
-    return HttpResponse('Test:'+str(Id))

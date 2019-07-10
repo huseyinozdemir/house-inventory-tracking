@@ -416,47 +416,21 @@ body.sidenav-toggled .navbar-sidenav .nav-item {
 
   <div class="content-wrapper">
     <div class="container-fluid">
-        <a href="{{ edit_action }}/new" class="btn btn-primary">New</a>
-  <table id="table" class="table table-hover table-striped">
-      <thead class="thead-dark">
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th class="text-right">Total Price</th>
-          <th class="text-center">Edit</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in rows %}
-        <tr>
-            <td>{{ row.id }}</td>
-            <td>
-                {% if row.building_name %}
-                    {{ row.building_name }} ->
-                {% endif %}
-                {% if row.flat_name %}
-                    {{ row.flat_name }} ->
-                {% endif %}
-                {% if row.room_name %}
-                    {{ row.room_name }} ->
-                {% endif %}
-                {{ row.name }}
-            </td>
-            <td class="text-right">
-                {% if row.total_price.total %}
-                    {{ row.total_price.total }}
-                {% elif row.price_value  %}
-                    {{ row.price_value }}
-                {% else  %}
-                    0
-                {% endif %}
-            </td>
-            <td class="text-right"><a href="{{ edit_action }}/{{ row.id }}" class="btn btn-info">Edit</a></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-  </table>
-      </div>
+
+
+<form method="post">
+  <div class="form-group">
+  {% if info %}
+    <div class="alert alert-success">{{ info  }}</div>
+  {% endif %}
+    <label for="name">Building Name</label>
+    <input type="text" class="form-control" id="name" name="name" aria-describedby="buildingHelp" placeholder="Building Name" value="{{ row.name }}">
+    <small id="buildingHelp" class="form-text text-muted"></small>
+  </div>
+  {% csrf_token %}
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
     </div>
   </div>
 </div>
