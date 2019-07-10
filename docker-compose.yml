@@ -10,3 +10,9 @@ services:
             - ./app:/app
         command: >
             sh -c "python manage.py runserver 0.0.0.0:8001"
+        networks:
+            - house-inventory-tracking-api_house-network
+
+networks:
+    house-inventory-tracking-api_house-network:
+        external: true
