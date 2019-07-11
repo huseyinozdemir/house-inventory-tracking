@@ -423,7 +423,8 @@ body.sidenav-toggled .navbar-sidenav .nav-item {
           <th>ID</th>
           <th>Name</th>
           <th class="text-right">Total Price</th>
-          <th class="text-center">Edit</th>
+          <th class="text-right">Edit</th>
+          <th class="text-right">Delete</th>
         </tr>
       </thead>
       <tbody>
@@ -452,6 +453,7 @@ body.sidenav-toggled .navbar-sidenav .nav-item {
                 {% endif %}
             </td>
             <td class="text-right"><a href="{{ edit_action }}/{{ row.id }}" class="btn btn-info">Edit</a></td>
+            <td class="text-right"><a href="{{ edit_action }}Del/{{ row.id }}?rm" onclick="return confirm('Are you sure?')" class="btn btn-info">Delete</a></td>
         </tr>
         {% endfor %}
       </tbody>

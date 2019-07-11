@@ -17,6 +17,39 @@ HEADER_NO_AUTH = {
     'Vary': "Accept"
 }
 
+def __delete(token, url, method="DELETE"):
+    headers = {
+        'Authorization': 'Token ' + token,
+    }
+
+    response = requests.request(
+        method, url=url, headers=headers
+    )
+
+    if not response:
+        return 'logout'
+
+    res = 'Success'
+
+    return res
+
+
+def __save(token, url, val=None, method="POST"):
+    headers = {
+        'Authorization': 'Token ' + token,
+    }
+
+    response = requests.request(
+        method, url=url, data=val, headers=headers
+    )
+
+    if not response:
+        return 'logout'
+
+    res = 'Success'
+
+    return res
+
 def __source(token, url):
     headers = {
         'Authorization': 'Token ' + token,
@@ -190,22 +223,6 @@ def fixtures(request):
     }
     return render(request, 'lists.html', context)
 
-def __save(token, url, val=None, method="POST"):
-    headers = {
-        'Authorization': 'Token ' + token,
-    }
-
-    response = requests.request(
-        method, url=url, data=val, headers=headers
-    )
-
-    if not response:
-        return 'logout'
-
-    res = 'Success'
-
-    return res
-
 
 def __buildingId(request, Tag):
     token = request.session['token'] if 'token' in request.session.keys() else ''
@@ -259,6 +276,18 @@ def building(request, Tag):
         return __buildingNew(request, Tag)
 
     return __buildingId(request, Tag)
+
+def buildingDel(request, Tag):
+    token = request.session['token'] if 'token' in request.session.keys() else ''
+    if token == '': return redirect(index)
+    url = API_HOST+API_BUILDING_URL+Tag
+
+    info = ''
+    if request.GET:
+        res = __delete(token, url, "DELETE")
+        if res == 'logout':
+            return redirect(logout)
+    return redirect(buildings)
 
 def __flatId(request, Tag):
     token = request.session['token'] if 'token' in request.session.keys() else ''
@@ -322,6 +351,17 @@ def flat(request, Tag):
         return __flatNew(request, Tag)
 
     return __flatId(request, Tag)
+
+def flatDel(request, Tag):
+    token = request.session['token'] if 'token' in request.session.keys() else ''
+    if token == '': return redirect(index)
+    url = API_HOST+API_FLAT_URL+Tag
+
+    if request.GET:
+        res = __delete(token, url, "DELETE")
+        if res == 'logout':
+            return redirect(logout)
+    return redirect(flats)
 
 def __roomId(request, Tag):
     token = request.session['token'] if 'token' in request.session.keys() else ''
@@ -397,6 +437,17 @@ def room(request, Tag):
         return __roomNew(request, Tag)
 
     return __roomId(request, Tag)
+
+def roomDel(request, Tag):
+    token = request.session['token'] if 'token' in request.session.keys() else ''
+    if token == '': return redirect(index)
+    url = API_HOST+API_ROOM_URL+Tag
+
+    if request.GET:
+        res = __delete(token, url, "DELETE")
+        if res == 'logout':
+            return redirect(logout)
+    return redirect(rooms)
 
 def __fixtureId(request, Tag):
     token = request.session['token'] if 'token' in request.session.keys() else ''
@@ -495,6 +546,17 @@ def fixture(request, Tag):
         return __fixtureNew(request, Tag)
 
     return __fixtureId(request, Tag)
+
+def fixtureDel(request, Tag):
+    token = request.session['token'] if 'token' in request.session.keys() else ''
+    if token == '': return redirect(index)
+    url = API_HOST+API_FIXTURE_URL+Tag
+
+    if request.GET:
+        res = __delete(token, url, "DELETE")
+        if res == 'logout':
+            return redirect(logout)
+    return redirect(fixtures)
 
 def logout(request):
     request.session['token'] = ''
