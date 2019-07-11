@@ -125,12 +125,30 @@ def rooms(request):
     token = request.session['token'] if 'token' in request.session.keys() else ''
     if token == '': return redirect(index)
 
-    obj = __source(token, API_HOST+API_ROOM_URL)
+    url = API_HOST+API_ROOM_URL
+    url_building = API_HOST+API_BUILDING_URL
+    url_flat = API_HOST+API_FLAT_URL
+
+    obj = __source(token, url)
+
+    buildings = __source(token, url_building)
+    flats = __source(token, url_flat)
+
+    for itm in obj:
+        for flat in flats:
+            if itm['flat_id'] == flat['id']:
+                itm['building_id'] = flat['building_id']
+
+    for itm in obj:
+        for building in buildings:
+            if itm['building_id'] == building['id']:
+                itm['building_name'] = building['name']
 
     context = {
         'title' : 'Rooms',
         'edit_action' : '/room',
         'rows' : obj,
+        #'rows' : flats,
     }
     return render(request, 'lists.html', context)
 
@@ -138,7 +156,32 @@ def fixtures(request):
     token = request.session['token'] if 'token' in request.session.keys() else ''
     if token == '': return redirect(index)
 
-    obj = __source(token, API_HOST+API_FIXTURE_URL)
+    url = API_HOST+API_FIXTURE_URL
+    url_building = API_HOST+API_BUILDING_URL
+    url_flat = API_HOST+API_FLAT_URL
+    url_room = API_HOST+API_ROOM_URL
+
+    obj = __source(token, url)
+    buildings = __source(token, url_building)
+    flats = __source(token, url_flat)
+    rooms = __source(token, url_room)
+
+    for itm in obj:
+        for room in rooms:
+            if itm['room_id'] == room['id']:
+                itm['flat_id'] = room['flat_id']
+
+    for itm in obj:
+        for flat in flats:
+            if itm['flat_id'] == flat['id']:
+                itm['building_id'] = flat['building_id']
+                itm['flat_name'] = flat['name']
+
+    for itm in obj:
+        for building in buildings:
+            if itm['building_id'] == building['id']:
+                itm['building_name'] = building['name']
+
 
     context = {
         'title' : 'Fixtures',
@@ -279,6 +322,179 @@ def flat(request, Tag):
         return __flatNew(request, Tag)
 
     return __flatId(request, Tag)
+
+def __roomId(request, Tag):
+    token = request.session['token'] if 'token' in request.session.keys() else ''
+    if token == '': return redirect(index)
+
+    url = API_HOST+API_ROOM_URL+str(Tag)+'/'
+    url_building = API_HOST+API_BUILDING_URL
+    url_flat = API_HOST+API_FLAT_URL
+
+    info = ''
+    if request.POST:
+        val = {
+            'name' : request.POST.get('name', ''),
+            'flat_id' : request.POST.get('flat_id', ''),
+        }
+        res = __save(token, url, val, "PUT")
+        if res == 'logout':
+            return redirect(logout)
+        info = res
+
+    row = __source(token, url)
+    buildings = __source(token, url_building)
+    flats = __source(token, url_flat)
+
+    for flat in flats:
+        flat['name'] = [building['name'] for building in buildings if building['id'] == flat['building_id']][0] + ' -> ' + flat['name']
+
+    context = {
+        'title': 'Item',
+        'row': row,
+        'flats': flats,
+        'info': info,
+    }
+    return render(request, 'item_room.html', context)
+
+
+def __roomNew(request, Tag):
+    token = request.session['token'] if 'token' in request.session.keys() else ''
+    if token == '': return redirect(index)
+    url = API_HOST+API_ROOM_URL
+    url_building = API_HOST+API_BUILDING_URL
+    url_flat = API_HOST+API_FLAT_URL
+
+    info = ''
+    if request.POST:
+        val = {
+            'name' : request.POST.get('name', ''),
+            'flat_id' : request.POST.get('flat_id', ''),
+        }
+        res = __save(token, url, val, "POST")
+        if res == 'logout':
+            return redirect(logout)
+        return redirect(rooms)
+
+
+    buildings = __source(token, url_building)
+    flats = __source(token, url_flat)
+
+    for flat in flats:
+        flat['name'] = [building['name'] for building in buildings if building['id'] == flat['building_id']][0] + ' -> ' + flat['name']
+
+    context = {
+        'title': 'Item',
+        'info': '',
+        'flats': flats,
+    }
+    return render(request, 'item_room.html', context)
+
+
+@csrf_protect
+def room(request, Tag):
+    if Tag == 'new':
+        return __roomNew(request, Tag)
+
+    return __roomId(request, Tag)
+
+def __fixtureId(request, Tag):
+    token = request.session['token'] if 'token' in request.session.keys() else ''
+    if token == '': return redirect(index)
+
+    url = API_HOST+API_FIXTURE_URL+str(Tag)+'/'
+    url_building = API_HOST+API_BUILDING_URL
+    url_flat = API_HOST+API_FLAT_URL
+    url_room = API_HOST+API_ROOM_URL
+
+    info = ''
+    if request.POST:
+        val = {
+            'name' : request.POST.get('name', ''),
+            'room_id' : request.POST.get('room_id', ''),
+            'price_value' : request.POST.get('price_value', ''),
+        }
+        res = __save(token, url, val, "PUT")
+        if res == 'logout':
+            return redirect(logout)
+        info = res
+
+    row = __source(token, url)
+    buildings = __source(token, url_building)
+    flats = __source(token, url_flat)
+    rooms = __source(token, url_room)
+
+    for room in rooms:
+        for flat in flats:
+            if flat['id'] == room['flat_id']:
+                room['name'] = flat['name'] + ' -> ' + room['name']
+                room['building_id'] = flat['building_id']
+
+    for room in rooms:
+        for building in buildings:
+            if building['id'] == room['building_id']:
+                room['name'] = building['name'] + ' -> ' + room['name']
+
+    context = {
+        'title': 'Item',
+        'row': row,
+        'rooms': rooms,
+        'info': info,
+    }
+    return render(request, 'item_fixture.html', context)
+
+
+def __fixtureNew(request, Tag):
+    token = request.session['token'] if 'token' in request.session.keys() else ''
+    if token == '': return redirect(index)
+
+    url = API_HOST+API_FIXTURE_URL
+    url_building = API_HOST+API_BUILDING_URL
+    url_flat = API_HOST+API_FLAT_URL
+    url_room = API_HOST+API_ROOM_URL
+
+    info = ''
+    if request.POST:
+        val = {
+            'name' : request.POST.get('name', ''),
+            'room_id' : request.POST.get('room_id', ''),
+            'price_value' : request.POST.get('price_value', ''),
+        }
+        res = __save(token, url, val, "POST")
+        if res == 'logout':
+            return redirect(logout)
+        return redirect(fixtures)
+
+
+    buildings = __source(token, url_building)
+    flats = __source(token, url_flat)
+    rooms = __source(token, url_room)
+
+    for room in rooms:
+        for flat in flats:
+            if flat['id'] == room['flat_id']:
+                room['name'] = flat['name'] + ' -> ' + room['name']
+                room['building_id'] = flat['building_id']
+
+    for room in rooms:
+        for building in buildings:
+            if building['id'] == room['building_id']:
+                room['name'] = building['name'] + ' -> ' + room['name']
+
+
+    context = {
+        'title': 'Item',
+        'info': '',
+        'rooms': rooms,
+    }
+    return render(request, 'item_fixture.html', context)
+
+@csrf_protect
+def fixture(request, Tag):
+    if Tag == 'new':
+        return __fixtureNew(request, Tag)
+
+    return __fixtureId(request, Tag)
 
 def logout(request):
     request.session['token'] = ''

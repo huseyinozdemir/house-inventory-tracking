@@ -12,4 +12,6 @@ urlpatterns = [
     path('logout', views.logout, name='logout'),
     path('building/<slug:Tag>', views.building, name='building'),
     path('flat/<slug:Tag>', views.flat, name='flat'),
+    path('room/<slug:Tag>', views.room, name='room'),
+    path('fixture/<slug:Tag>', views.fixture, name='fixture'),
 ]

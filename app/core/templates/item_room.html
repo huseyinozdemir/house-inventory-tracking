@@ -423,18 +423,18 @@ body.sidenav-toggled .navbar-sidenav .nav-item {
   {% if info %}
     <div class="alert alert-success">{{ info  }}</div>
   {% endif %}
-    <label for="name">Flat Name</label>
-    <input type="text" class="form-control" id="name" name="name" aria-describedby="flatHelp" placeholder="Flat Name" value="{{ row.name }}">
-    <small id="flatHelp" class="form-text text-muted"></small>
+    <label for="name">Room Name</label>
+    <input type="text" class="form-control" id="name" name="name" aria-describedby="roomHelp" placeholder="Room Name" value="{{ row.name }}">
+    <small id="roomHelp" class="form-text text-muted"></small>
   </div>
   <div class="form-group">
 
-<select name="building_id" class="form-control">
-    {% for building in buildings %}
-        {% ifequal building.id row.building_id %}
-            <option value="{{ building.id }}" selected="selected">{{ building.name }}</option>
+<select name="flat_id" class="form-control">
+    {% for flat in flats %}
+        {% ifequal flat.id row.flat_id %}
+            <option value="{{ flat.id }}" selected="selected">{{ flat.name }}</option>
         {% else %}
-            <option value="{{ building.id }}">{{ building.name }}</option>
+            <option value="{{ flat.id }}">{{ flat.name }}</option>
         {% endifequal %}
     {% endfor %}
 </select>

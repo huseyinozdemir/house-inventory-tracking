@@ -404,13 +404,13 @@ body.sidenav-toggled .navbar-sidenav .nav-item {
           </a>
         </li>
       </ul>
-      
+
       <ul class="navbar-nav2 ml-auto">
         <li>
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome Metglobal Case</a>
         </li>
       </ul>
-      
+
     </div>
   </nav>
 
@@ -423,22 +423,26 @@ body.sidenav-toggled .navbar-sidenav .nav-item {
   {% if info %}
     <div class="alert alert-success">{{ info  }}</div>
   {% endif %}
-    <label for="name">Flat Name</label>
-    <input type="text" class="form-control" id="name" name="name" aria-describedby="flatHelp" placeholder="Flat Name" value="{{ row.name }}">
-    <small id="flatHelp" class="form-text text-muted"></small>
+    <label for="name">Fixture Name</label>
+    <input type="text" class="form-control" id="name" name="name" aria-describedby="fixtureHelp" placeholder="Fixture Name" value="{{ row.name }}">
+    <small id="fixtureHelp" class="form-text text-muted"></small>
   </div>
   <div class="form-group">
 
-<select name="building_id" class="form-control">
-    {% for building in buildings %}
-        {% ifequal building.id row.building_id %}
-            <option value="{{ building.id }}" selected="selected">{{ building.name }}</option>
+<select name="room_id" class="form-control">
+    {% for room in rooms %}
+        {% ifequal room.id row.room_id %}
+            <option value="{{ room.id }}" selected="selected">{{ room.name }}</option>
         {% else %}
-            <option value="{{ building.id }}">{{ building.name }}</option>
+            <option value="{{ room.id }}">{{ room.name }}</option>
         {% endifequal %}
     {% endfor %}
 </select>
 
+  </div>
+  <div class="form-group">
+    <label for="price_value">Price Value</label>
+    <input type="text" class="form-control" id="price_value" name="price_value" aria-describedby="priceValueHelp" placeholder="Price Value" value="{{ row.price_value }}">
   </div>
   {% csrf_token %}
   <button type="submit" class="btn btn-primary">Submit</button>
